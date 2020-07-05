@@ -1,0 +1,602 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.3 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>The simpleFoam implementation — explained - Programming with Fluids</title>
+<meta name="description" content="Tip — This is not meant to be a standalone article. It’s much more useful walking along this like a tutorial and not just reading through . So I highly recommend catching up to the point of entry in this article with the previous one.">
+
+
+  <meta name="author" content="Mustafa Bhotvawala">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Programming with Fluids">
+<meta property="og:title" content="The simpleFoam implementation — explained">
+<meta property="og:url" content="http://localhost:4000/of3/">
+
+
+  <meta property="og:description" content="Tip — This is not meant to be a standalone article. It’s much more useful walking along this like a tutorial and not just reading through . So I highly recommend catching up to the point of entry in this article with the previous one.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2020-06-20T00:00:00+03:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/of3/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Mustafa Bhotvawala",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Programming with Fluids Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/logo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Programming with Fluids
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li><li class="masthead__menu-item">
+              <a href="/contact">Contact</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/dp.png" alt="Mustafa Bhotvawala" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Mustafa Bhotvawala</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Applied Mathematics and Computational Fluid Dynamics (CFD) - more than just colorful pictures!</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Wolfsburg</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="mailto:mustafa.bhotvawala@rwth-aachen.de" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">The simpleFoam implementation — explained</h1>
+    
+    <p>Tip — This is not meant to be a standalone article. It’s much more useful walking along this like a tutorial and not just reading through . So I highly recommend catching up to the point of entry in this article with the previous one.</p>
+
+<p>Let’s look at the actual implementation of simpleFoam in this article. We left off by preparing the solver with all the mesh, field, and time objects that it would need. This is what you should see:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*2ytEDfp2nkIn0IIDuwToNg.png" alt="simpleFoam.C" /><em>simpleFoam.C</em></p>
+<blockquote>
+  <p>Before you move ahead, I recommend you see this really good <a href="https://www.youtube.com/watch?v=OOILoJ1zuiw">video</a> (Aidan Wimshurst) on an introduction to the algorithm. (If you haven’t checked the whole series out, please do!)</p>
+</blockquote>
+
+<p>In an incompressible simulation, you have more variables (<strong><em>u,v,w,p</em></strong>) than equations. The system cannot be solved directly because there is no explicit equation for pressure. That’s why you need an algorithm to do this. As a refresher, the N-S equation is shown in vector form below:</p>
+
+<p>ρ D<strong>U</strong>/Dt = -∇ p + ∇ . <strong>τ</strong> + ρ** g**</p>
+
+<p>Let’s convert this into the simplest matrix system we can think of, considering the stress term is a function of velocities too:</p>
+
+<p><strong>MU</strong> = -∇ p …….. (1)</p>
+
+<p>Here, <strong><em>M **</em>is just the coefficient matrix of the velocities. Now, what most algorithms do is convert this sparse matrix **<em>M **</em>into a diagonal and an off-diagonal matrix. The diagonal matrix is called **<em>A</em></strong> in OpenFOAM, while the off-diagonal one is called <strong><em>H</em></strong>. This will become clear in a bit once you see the source code. The decomposition is done as follows:</p>
+
+<p><strong>AU</strong> -<strong>H</strong> =-∇ p …….. (2)</p>
+
+<p>What the algorithm does is essentially the following.</p>
+
+<ol>
+  <li>It solves directly for velocity U. This is called the momentum predictor step:</li>
+</ol>
+
+<p><strong>U</strong> =** H<strong>/</strong>A** -∇ p/**A **…….. (3)</p>
+
+<p>Simple yes? Turns out however, this velocity was not giving a constraint of mass conservation. <strong>This velocity satisfies the momentum equations but not the continuity equations.</strong></p>
+
+<p>∇.<strong>U</strong> = 0 …….. (4)</p>
+
+<ol>
+  <li>To satisfy this condition, the equation in (3) is inserted in the equation in (4). This yields a Poisonn equation for pressure — this is solved for pressure.</li>
+</ol>
+
+<p>∇.(∇p/<strong>A</strong>) = ∇.(<strong>H</strong>/<strong>A</strong>)…….. (5)</p>
+
+<ol>
+  <li>The pressure correction is used to obtain the correct velocity that satisfies the continuity equation. *But wait, this no longer satisfies the momentum equation now! *This needs to be iterated in a loop until the solution converges.</li>
+</ol>
+
+<p>Let’s observe how this is implemented. The two main solution components of the algorithm lie inside these two files:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include UEqn.H
+#include pEqn.H
+</code></pre></div></div>
+
+<p>Let’s step into* UEqn.H:*</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*-sDyjYOg1IZCYWqEn2n1UA.png" alt="UEqn.H" /><em>UEqn.H</em></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tmp&lt;fvVectorMatrix&gt; tUEqn
+(
+fvm::div(phi, U)
++ MRF.DDt(U)
++ turbulence-&gt;divDevReff(U)
+==
+fvOptions(U)
+);
+</code></pre></div></div>
+
+<p>This creates a tUEqn object of type fvVectorMatrix. This is essentially the **MU **system discussed above. This includes contributions from Moving Reference Frame (MRF) and the stress tensor, both functions of velocity and hence part of the matrix.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>solve(UEqn == -fvc::grad(p))
+</code></pre></div></div>
+
+<p>This is equivalent to the <strong>MU</strong> = -∇ p portion of the algorithm. Now, we have a UEqn object that contains the solution of this system of equations.</p>
+
+<p>The diagonal matrix is extracted by* UEqn.A() <em>and the off-diagonal matrix by *UEqn.H()</em>. We see this when we enter <em>pEqn.H</em>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>volScalarField **rAU**(1.0/UEqn.A());
+
+volVectorField **HbyA**(constrainHbyA(rAU*UEqn.H(), U, p));
+
+surfaceScalarField **phiHbyA**(“phiHbyA”, fvc::flux(HbyA));
+</code></pre></div></div>
+
+<p><strong>rAU</strong> is simply 1/A,</p>
+
+<p><strong>HbyA</strong> is unsurprisingly, H/A</p>
+
+<p>and <strong>phiHbyA</strong> is the surfaceScalarField equivalent of HbyA, which is originally a volVectorField.</p>
+
+<p>The Poisson equation that needs to be solved is <strong>∇.(∇p/A) = ∇.(H/A)</strong>, which calculates pressure. This is very direct translation into code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fvScalarMatrix pEqn
+
+(
+fvm::laplacian(rAtU(), p) == fvc::div(phiHbyA)
+);
+
+pEqn.solve();
+</code></pre></div></div>
+
+<p>The last step of the algorithm is fairly straightforward too. The new pressure values are used to correct the velocity so that it satisfies the continuity equation. This equation — <strong>U</strong> =** H<strong>/</strong>A** -∇ p/<strong>A</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>U = HbyA — rAtU()*fvc::grad(p);
+
+U.correctBoundaryConditions();
+</code></pre></div></div>
+
+<p>That’s the end of one SIMPLE iteration. This will continue until convergence. There are a fair number of components this tutorial did not cover — mainly to avoid a tedious long read, relaxation factors, non-orthogonal correction etc to name a few. If this helped you gain some intuition into how essentially the most fundamental solver in OpenFOAM works, these could be covered in more advanced articles.</p>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">5</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/ofFSI/" rel="permalink">Setting up a Fluid Structure Interaction Workflow with OpenFOAM and deal.II
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">I spent a summer with a research group specializing in a variety of topics in non-linear dynamics, one of them being the Fluid Structure Interaction (FSI) of...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/ofConsistent/" rel="permalink">Analyzing SIMPLEC — the “consistent” simpleFOAM control
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The previous articles in this series took on debugging the simpleFoam solver through a VSCode debugger. SIMPLEC, a “consistent” implementation of the SIMPLE ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of3/" rel="permalink">The simpleFoam implementation — explained
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Tip — This is not meant to be a standalone article. It’s much more useful walking along this like a tutorial and not just reading through . So I highly recom...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of2/" rel="permalink">Stepping through simpleFoam with VS Code — a guide to debugging solvers
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This is a the second article in a series exploring utilities of OpenFOAM for viewers beginning with CFD — geared towards OpenFOAM beginners. The toolbox has ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of1/" rel="permalink">Setting up my OpenFOAM Development Environment on Windows!
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Well, if you’re this far, you’re no stranger to open source fluid simulation software. Or you’ve finally broken free from the binds that commercial CFD softw...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Mustafa Bhotvawala. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

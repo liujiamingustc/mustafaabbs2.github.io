@@ -1,0 +1,640 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.3 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Stepping through simpleFoam with VS Code — a guide to debugging solvers - Programming with Fluids</title>
+<meta name="description" content="This is a the second article in a series exploring utilities of OpenFOAM for viewers beginning with CFD — geared towards OpenFOAM beginners. The toolbox has a steep learning curve, but a see-through box offers far more control than a black one. Though we set up an environment to code our own solvers in the last article, we don’t have a debug environment to fix things when wrong, or to see how the code flows.">
+
+
+  <meta name="author" content="Mustafa Bhotvawala">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Programming with Fluids">
+<meta property="og:title" content="Stepping through simpleFoam with VS Code — a guide to debugging solvers">
+<meta property="og:url" content="http://localhost:4000/of2/">
+
+
+  <meta property="og:description" content="This is a the second article in a series exploring utilities of OpenFOAM for viewers beginning with CFD — geared towards OpenFOAM beginners. The toolbox has a steep learning curve, but a see-through box offers far more control than a black one. Though we set up an environment to code our own solvers in the last article, we don’t have a debug environment to fix things when wrong, or to see how the code flows.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2020-06-20T00:00:00+03:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/of2/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Mustafa Bhotvawala",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Programming with Fluids Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/logo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Programming with Fluids
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li><li class="masthead__menu-item">
+              <a href="/contact">Contact</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/dp.png" alt="Mustafa Bhotvawala" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Mustafa Bhotvawala</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Applied Mathematics and Computational Fluid Dynamics (CFD) - more than just colorful pictures!</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Wolfsburg</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="mailto:mustafa.bhotvawala@rwth-aachen.de" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Stepping through simpleFoam with VS Code — a guide to debugging solvers</h1>
+    
+    <p>This is a the second article in a series exploring utilities of OpenFOAM for viewers beginning with CFD — geared towards OpenFOAM beginners. The toolbox has a steep learning curve, but a see-through box offers far more control than a black one. Though we set up an environment to code our own solvers in the last article, we don’t have a debug environment to fix things when wrong, or to see how the code flows.</p>
+
+<p><a href="https://www.google.com/search?q=Openfoam+debug+Opt&amp;rlz=1C1CHBF_enKW850KW850&amp;oq=Openfoam+debug+Opt&amp;aqs=chrome..69i57j35i39l3j69i60j69i58j69i60l2.4077j0j7&amp;sourceid=chrome&amp;ie=UTF-8">Debug mode</a> allows you to do just this. We unpacked OpenFOAM directly into the <em>/opt/</em> folder in our last article. This was the default “Opt” compilation. OpenFOAM needs to be compiled again in debug mode. Navigate to your .bashrc file in OpenFOAM’s* etc/* folder and switch the flag:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>WM_COMPILE_OPTION=**Debug**
+</code></pre></div></div>
+
+<p>Move back a directory and compile OpenFOAM:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./Allwmake
+</code></pre></div></div>
+
+<p>Debug mode is almost double the size of the normal compilation. This will take a while, atleast a few hours. Try running *Allwmake *in parallel to speed things up (for example, here with four processors):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./Allwmake -j 4
+</code></pre></div></div>
+
+<p>I recommend aliases to switch between your debug and Opt modes. Copy your OpenFOAM <em>.bashrc *file into</em> .bashrc_debug*. Source your *.bashrc_debug *file to activate debug mode.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>**alias** of1912deb=”source /opt/OpenFOAM/OpenFOAM-v1912/etc/bashrc_debug”
+</code></pre></div></div>
+
+<p>A quick check to see if you’re in debug mode -</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>**which** icoFoam
+
+//should get--&gt; /opt/OpenFOAM/OpenFOAM-v1912/platforms/linux64Gcc63DPInt32**Debug**/bin/icoFoam
+</code></pre></div></div>
+
+<p>Debug mode allows the <a href="http://www.gnu.org/software/gdb/">gdb</a> debugger to step through your code. You could do this in a terminal too, but I prefer working in an IDE, especially for code that’s as layered as OpenFOAM.</p>
+
+<p>We’ll walk through<a href="https://www.openfoam.com/documentation/guides/latest/doc/guide-applications-solvers-incompressible-simpleFoam.html"> simpleFoam</a> in this example. simpleFoam uses the <a href="https://en.wikipedia.org/wiki/SIMPLE_algorithm">SIMPLE</a> algorithm to solve the N-S equations for incompressible fluid flow, for a steady state solution. It’s a great starting point for most explanation on OpenFOAM.</p>
+
+<p>Copy simpleFoam into your $WM_PROJECT_USER_DIR.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cp -r $FOAM_SOLVERS/incompressible/simpleFoam $WM_PROJECT_USER_DIR
+</code></pre></div></div>
+
+<p>To debug the solver, you need to supply it with the input files it needs from the OpenFOAM case structure. I simply copy a <em>pitzDaily</em> tutorial into the same folder as the solver code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cp -r $FOAM_SOLVERS/incompressible/simpleFoam/pitzDaily/* $WM_PROJECT_USER_DIR/simpleFoam
+</code></pre></div></div>
+
+<p>The contents of your folder should look like this:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*ir8AASrzIsdDAxqrdqpK9Q.png" alt="" /></p>
+
+<p>Start your VSCode environment:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>code .
+</code></pre></div></div>
+
+<p>Navigate to the <em>simpleFoam.C *file. Place two breakpoints at the same locations as in the picture, after *argList:addNote</em> and at <em>turbulence -&gt; validate()</em>.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*GfL7HeWOzxlwv6gDOJTLAQ.png" alt="" /></p>
+
+<p>For those not familiar with debuggers — find the command Run — Start Debugging to execute.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*liKX-zqCw6G8-ZOjRfb3gg.png" alt="Options to move along the code — Continue, Step Over, Step Into, Step Out" /><em>Options to move along the code — Continue, Step Over, Step Into, Step Out</em></p>
+
+<p>To move through the code, there are four options you need to use:</p>
+
+<ol>
+  <li>
+    <p><strong>Continue</strong>: will move to the next breakpoint</p>
+  </li>
+  <li>
+    <p><strong>Step Over</strong>: will proceed to the next line of code without entering the function on that line. If you step over <em>turbulence-&gt;validate()</em>, it will move to the next line after executing it, but you will not move through the contents of the method itself</p>
+  </li>
+  <li>
+    <p><strong>Step Into</strong>: will enter the method</p>
+  </li>
+  <li>
+    <p><strong>Step Out</strong>: returns control to the preceding stack frame — i.e. if you’ve entered <em>turbulence-&gt;validate()</em> with Step Into, it will finish execution of the method and return control to simpleFoam.C</p>
+  </li>
+</ol>
+
+<p>Let’s run the debugger. If you want to work your way through the following header files too, I recommend adding a breakpoint at the *argList::addNote *line.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>argList::addNote
+
+(
+
+"Steady-state solver for incompressible, turbulent flows."
+
+);
+
+#include "postProcess.H"
+#include "addCheckCaseOptions.H"
+#include "setRootCaseLists.H"
+#include "createTime.H"
+#include "createMesh.H"
+#include "createControl.H"
+#include "createFields.H"
+#include "initContinuityErrs.H"
+</code></pre></div></div>
+
+<p>We won’t enter the header files this way, but I can quickly desribe how the flow of code happens through these.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include "postProcess.H"
+#include "addCheckCaseOptions.H"
+#include "setRootCaseLists.H"
+</code></pre></div></div>
+
+<p>The <em>postProcess.H</em> header file checks if the postProcess flag is issued and creates a list of all the function objects in the controlDict. *setRootCaseLists.H *parses through all the advanced switches that can be given to simpleFoam. For a list of these switches, see the <a href="https://www.openfoam.com/documentation/guides/latest/man/simpleFoam.html">documentation</a>.</p>
+
+<p>Header files are entered as though they’re part of the code. You can observe which file the debugger is currently paused at by looking at the call stack.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*n_GFqwR0A_36kyeoatGqLQ.png" alt="" /></p>
+
+<p>Let’s work our way down the code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include "createTime.H"
+#include "createMesh.H"
+#include "createControl.H"
+</code></pre></div></div>
+
+<p><em>createTime.H</em> and <em>createMesh.H</em>, as their names suggests, create their respective* runTime* and <em>mesh</em> objects. <em>createTime.H</em> generates your first real output statement to your log file — “Create time”.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Foam::Info&lt;&lt; “Create time\n” &lt;&lt; Foam::endl;
+
+Foam::Time runTime(Foam::Time::controlDictName, args);
+</code></pre></div></div>
+
+<p><em>createMesh.H</em> is simple — it creates a mesh object (class <em>fvMesh</em>) for the corresponding <em>runTime</em> object.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Foam::autoPtr&lt;Foam::fvMesh&gt; meshPtr(nullptr);
+
+Foam::fvMesh&amp; mesh = meshPtr();
+</code></pre></div></div>
+
+<p><em>createFields.H *is present in your solver directory. The field objects <strong>*p</strong></em> (pressure), <strong><em>U</em></strong> (velocity) are created here. Moreover, any new fields you want to evaluate — here’s where they need to be created for the solver to parse through.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*zJ46W2L9c0C7XgDPHxRa4A.png" alt="createFields.H" /><em>createFields.H</em></p>
+
+<p>The face flux <strong><em>phi</em></strong> is also created here through a header file inside *createFields.H. *Additionally, the <strong>transport model</strong> (based on your viscosity) as well as the <strong>turbulence model</strong> objects are created here.</p>
+
+<p>Keep checking your terminal to see your outputs too — this is a sanity check to see that the flow of output is just like what we’d expect:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*GVTQGg15lCugAW9UOwnuhw.png" alt="Your terminal" /><em>Your terminal</em></p>
+
+<p>Voila, you’ve got through the setting up of the solver — your mesh, time, and fields, and models are now ready. The next article in the series will stick with this example, but move onto the actual code characteristic to <em>simpleFoam</em> — with a bit of math to explain how the SIMPLE algorithm is implemented.</p>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">5</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/ofFSI/" rel="permalink">Setting up a Fluid Structure Interaction Workflow with OpenFOAM and deal.II
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">I spent a summer with a research group specializing in a variety of topics in non-linear dynamics, one of them being the Fluid Structure Interaction (FSI) of...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/ofConsistent/" rel="permalink">Analyzing SIMPLEC — the “consistent” simpleFOAM control
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The previous articles in this series took on debugging the simpleFoam solver through a VSCode debugger. SIMPLEC, a “consistent” implementation of the SIMPLE ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of3/" rel="permalink">The simpleFoam implementation — explained
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Tip — This is not meant to be a standalone article. It’s much more useful walking along this like a tutorial and not just reading through . So I highly recom...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of2/" rel="permalink">Stepping through simpleFoam with VS Code — a guide to debugging solvers
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This is a the second article in a series exploring utilities of OpenFOAM for viewers beginning with CFD — geared towards OpenFOAM beginners. The toolbox has ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of1/" rel="permalink">Setting up my OpenFOAM Development Environment on Windows!
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Well, if you’re this far, you’re no stranger to open source fluid simulation software. Or you’ve finally broken free from the binds that commercial CFD softw...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Mustafa Bhotvawala. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

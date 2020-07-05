@@ -1,0 +1,596 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.3 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Setting up my OpenFOAM Development Environment on Windows! - Programming with Fluids</title>
+<meta name="description" content="Well, if you’re this far, you’re no stranger to open source fluid simulation software. Or you’ve finally broken free from the binds that commercial CFD software pose — “I’m just going to do it myself”, you say all too confidently as you jostle out of your fifteenth meeting with your software support that month.">
+
+
+  <meta name="author" content="Mustafa Bhotvawala">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Programming with Fluids">
+<meta property="og:title" content="Setting up my OpenFOAM Development Environment on Windows!">
+<meta property="og:url" content="http://localhost:4000/of1/">
+
+
+  <meta property="og:description" content="Well, if you’re this far, you’re no stranger to open source fluid simulation software. Or you’ve finally broken free from the binds that commercial CFD software pose — “I’m just going to do it myself”, you say all too confidently as you jostle out of your fifteenth meeting with your software support that month.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2020-04-25T00:00:00+03:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/of1/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Mustafa Bhotvawala",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Programming with Fluids Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--posts">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/logo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Programming with Fluids
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li><li class="masthead__menu-item">
+              <a href="/contact">Contact</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/dp.png" alt="Mustafa Bhotvawala" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Mustafa Bhotvawala</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Applied Mathematics and Computational Fluid Dynamics (CFD) - more than just colorful pictures!</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Wolfsburg</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="mailto:mustafa.bhotvawala@rwth-aachen.de" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title">Setting up my OpenFOAM Development Environment on Windows!</h1>
+    
+    <p>Well, if you’re this far, you’re no stranger to open source fluid simulation software. Or you’ve finally broken free from the binds that commercial CFD software pose — “I’m just going to do it myself”, you say all too confidently as you jostle out of your fifteenth meeting with your software support that month.</p>
+
+<p>A full Linux development environment is often too intimidating for those just starting to make a switch from commercial tools to OpenFOAM. Windows until recently was, and to some extent still is, a poor solution for numerical computing. <a href="https://www.pcworld.com/article/230527/ubuntu_linux_day_16_ext4_vs_ntfs.html">The NTFS file system on Windows is slower than the ext4 for frequent I/O which is a mainstay of computing applications.</a> There were limited options to those looking to run OpenFOAM on Windows without a dual-boot.</p>
+
+<ol>
+  <li>
+    <p>A <a href="https://openfoam.org/download/windows-vm/">VM install</a> was the go-to solution, however I found that it significantly slowed my host device.</p>
+  </li>
+  <li>
+    <p>A native Windows build, <a href="http://bluecfd.github.io/Core/About/">blueCFD-Core</a>, based on a <a href="https://www.msys2.org/">MSys2</a> build platform (built with on a Cygwin layer for the Linux “feel” and MinGw, for compilation on Windows.). The full software stack makes it quite bulky for use.</p>
+  </li>
+  <li>
+    <p><a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">Windows Subsystem for Linux (WSL)</a>: The original WSL is a GNU environment for Windows without any virtualization, and with a very slow read/write ability to the Windows file system.</p>
+  </li>
+</ol>
+
+<p>My move to Windows was recent — circumstances around the pandemic made me switch to a new system which I did not want to have a dual boot on. Luckily, we live in times of the <a href="https://docs.microsoft.com/en-us/windows/wsl/wsl2-index">WSL2</a>. The new version of the architecture in WSL allows increased file system performance, perations like cmake and git clone can run up to 20x faster — count me in.</p>
+
+<p>I will not describe setting up the WSL 2 VM in this article. There is a fairly comprehensive install guide <a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">here</a>.</p>
+
+<ol>
+  <li>
+    <p>Once you have WSL ready, download the OpenFOAM release (<a href="https://sourceforge.net/projects/openfoam/files/v1912/OpenFOAM-v1912-windows10.tgz">here</a>, 19.12).</p>
+  </li>
+  <li>
+    <p>Copy the .tgz to your folder of choice.</p>
+
+    <p>cp -ar /mnt/c/Users/<USER>/Downloads/OpenFOAM-v1912-windows10.tgz .</USER></p>
+  </li>
+  <li>
+    <p>Untar to the /opt folder and change permissions.</p>
+
+    <p>sudo tar -xvzf  OpenFOAM-v1912-windows10.tgz -C /opt/
+ sudo chown -R $USER /opt/OpenFOAM</p>
+  </li>
+  <li>
+    <p>Source your .bashrc file!</p>
+
+    <p>echo “source /opt/OpenFOAM/OpenFOAM-v1912/etc/bashrc” » ~/.bashrc
+ source $HOME/.bashrc</p>
+  </li>
+</ol>
+
+<p>And you’re good to go. Verify your source by running a tutorial case.</p>
+
+<p>The purpose of this article is to set up a <strong>development</strong> environment for OpenFOAM — you need to create:</p>
+
+<ol>
+  <li>
+    <p>A directory that houses your custom solver and library source code. This is preferably somewhere in your <strong>$WM_PROJECT_DIR</strong> folder.</p>
+  </li>
+  <li>
+    <p>Directories for the binaries generated from your custom solver and the .so files generated from your custom library. You’ll need to create a directory that is defined by your variables <strong>$FOAM_USER_APPBIN</strong> and **$FOAM_USER_LIBBIN **respectively.</p>
+  </li>
+</ol>
+
+<p>This is how my custom solver and library directory (as described in 1.) should look like:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*_qMiorNX0Qk96gHyHrhEig.png" alt="" /></p>
+
+<p>myReactingParcelFoam is my custom solver modifying reactingParcelFoam, and surfaceFilmModels is where I hold the libraries that the solver depends on.</p>
+
+<p>Notice the vscode folder? The perfect pair to OpenFOAM programming, as I’ve discovered, is <a href="https://code.visualstudio.com/">Visual Studio Code</a>. You can download this to run on your Windows system. Yes — you run it on Windows and keep the source in your WSL environment. You need to install the <a href="https://code.visualstudio.com/remote-tutorials/wsl/getting-started">remote WSL extension</a> in VS Code to couple the two environments. Additionally, install the <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools">C/C++ extension</a> too.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*9k6bv6VmYFTM0VniBTynMQ.png" alt="What your extensions should look like" /><em>What your extensions should look like</em></p>
+
+<p>Voila! All you need to do is run the following command in the directory you want to create a VS Code directory for:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>code . 
+</code></pre></div></div>
+
+<p>This creates a .vscode folder in that directory. Additionally, it will open up VS Code with your project, for instance:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*jFosjbe2Wxj2Hqj0XUVMNg.png" alt="What your VS Code instance should look like (minus the files in .vscode, we’ll get to this)" /><em>What your VS Code instance should look like (minus the files in .vscode, we’ll get to this)</em></p>
+
+<p>The files in .vscode that are of relevance are: <em>launch.json</em>, <em>tasks.json *and *c_cpp_properties.json</em>. These will be created when you add a configuration, but you will have to modify them. These give VS Code inputs on what task to run.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*wXqMwzDj5VuMw5JV8igGqQ.png" alt="A sample tasks.json file" /><em>A sample tasks.json file</em></p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*HJZ4TXPlKAzGRgzHYAZhfA.png" alt="A sample launch.json file" /><em>A sample launch.json file</em></p>
+
+<p>If you’ve gone through these .json files, the command in <em>tasks.json</em> is <strong>wmake</strong>, which is a wrapper around make for OpenFOAM. This is given a label <em>*wmake-build **which is referenced in the “preLaunchTask” field in *launch.json</em>.</p>
+
+<p>“program” specifies where to deposit the binary from the executable. As discussed, this should be in <strong>$FOAM_USER_APPBIN.</strong></p>
+
+<p>The final .json file, <em>c_cpp_properties.json</em>, contains the include paths for the compiler, as well as the settings for Intellisense.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*OgX1Oz6TLtc5vF_Wwrv-pw.png" alt="" /></p>
+
+<p>Edit the Make/files to make sure your binary ends up in the right place after wmake.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*8WSHlW8QLAz48vPortUHHA.png" alt="" /></p>
+
+<p>This process is very similar for compiling your own libraries. You will have to write in <em>*wmake libso **in the *tasks.json</em> file instead to compile all the .so files.</p>
+
+<p>And voila, you can compile OpenFOAM code! Complete with code completion and references to other code blocks — this allows for a seamless start into the freedom OpenFOAM development brings with it.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2732/1*reDyQdIu4_p2RvhvQt64ag.png" alt="" /></p>
+
+
+<ul class="taxonomy__index">
+  
+  
+    <li>
+      <a href="#2020">
+        <strong>2020</strong> <span class="taxonomy__count">5</span>
+      </a>
+    </li>
+  
+</ul>
+
+
+
+  <section id="2020" class="taxonomy__section">
+    <h2 class="archive__subtitle">2020</h2>
+    <div class="entries-list">
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/ofFSI/" rel="permalink">Setting up a Fluid Structure Interaction Workflow with OpenFOAM and deal.II
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">I spent a summer with a research group specializing in a variety of topics in non-linear dynamics, one of them being the Fluid Structure Interaction (FSI) of...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/ofConsistent/" rel="permalink">Analyzing SIMPLEC — the “consistent” simpleFOAM control
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">The previous articles in this series took on debugging the simpleFoam solver through a VSCode debugger. SIMPLEC, a “consistent” implementation of the SIMPLE ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of3/" rel="permalink">The simpleFoam implementation — explained
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Tip — This is not meant to be a standalone article. It’s much more useful walking along this like a tutorial and not just reading through . So I highly recom...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of2/" rel="permalink">Stepping through simpleFoam with VS Code — a guide to debugging solvers
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">This is a the second article in a series exploring utilities of OpenFOAM for viewers beginning with CFD — geared towards OpenFOAM beginners. The toolbox has ...</p>
+  </article>
+</div>
+
+      
+        
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/of1/" rel="permalink">Setting up my OpenFOAM Development Environment on Windows!
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Well, if you’re this far, you’re no stranger to open source fluid simulation software. Or you’ve finally broken free from the binds that commercial CFD softw...</p>
+  </article>
+</div>
+
+      
+    </div>
+    <a href="#page-title" class="back-to-top">Back to top &uarr;</a>
+  </section>
+
+
+  </div>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Mustafa Bhotvawala. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
