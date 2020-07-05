@@ -1,0 +1,99 @@
+I"�<p>Well, if you’re this far, you’re no stranger to open source fluid simulation software. Or you’ve finally broken free from the binds that commercial CFD software pose — “I’m just going to do it myself”, you say all too confidently as you jostle out of your fifteenth meeting with your software support that month.</p>
+
+<p>A full Linux development environment is often too intimidating for those just starting to make a switch from commercial tools to OpenFOAM. Windows until recently was, and to some extent still is, a poor solution for numerical computing. <a href="https://www.pcworld.com/article/230527/ubuntu_linux_day_16_ext4_vs_ntfs.html">The NTFS file system on Windows is slower than the ext4 for frequent I/O which is a mainstay of computing applications.</a> There were limited options to those looking to run OpenFOAM on Windows without a dual-boot.</p>
+
+<ol>
+  <li>
+    <p>A <a href="https://openfoam.org/download/windows-vm/">VM install</a> was the go-to solution, however I found that it significantly slowed my host device.</p>
+  </li>
+  <li>
+    <p>A native Windows build, <a href="http://bluecfd.github.io/Core/About/">blueCFD-Core</a>, based on a <a href="https://www.msys2.org/">MSys2</a> build platform (built with on a Cygwin layer for the Linux “feel” and MinGw, for compilation on Windows.). The full software stack makes it quite bulky for use.</p>
+  </li>
+  <li>
+    <p><a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">Windows Subsystem for Linux (WSL)</a>: The original WSL is a GNU environment for Windows without any virtualization, and with a very slow read/write ability to the Windows file system.</p>
+  </li>
+</ol>
+
+<p>My move to Windows was recent — circumstances around the pandemic made me switch to a new system which I did not want to have a dual boot on. Luckily, we live in times of the <a href="https://docs.microsoft.com/en-us/windows/wsl/wsl2-index">WSL2</a>. The new version of the architecture in WSL allows increased file system performance, perations like cmake and git clone can run up to 20x faster — count me in.</p>
+
+<p>I will not describe setting up the WSL 2 VM in this article. There is a fairly comprehensive install guide <a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">here</a>.</p>
+
+<ol>
+  <li>
+    <p>Once you have WSL ready, download the OpenFOAM release (<a href="https://sourceforge.net/projects/openfoam/files/v1912/OpenFOAM-v1912-windows10.tgz">here</a>, 19.12).</p>
+  </li>
+  <li>
+    <p>Copy the .tgz to your folder of choice.</p>
+
+    <p>cp -ar /mnt/c/Users/<USER>/Downloads/OpenFOAM-v1912-windows10.tgz .</USER></p>
+  </li>
+  <li>
+    <p>Untar to the /opt folder and change permissions.</p>
+
+    <p>sudo tar -xvzf  OpenFOAM-v1912-windows10.tgz -C /opt/
+ sudo chown -R $USER /opt/OpenFOAM</p>
+  </li>
+  <li>
+    <p>Source your .bashrc file!</p>
+
+    <p>echo “source /opt/OpenFOAM/OpenFOAM-v1912/etc/bashrc” » ~/.bashrc
+ source $HOME/.bashrc</p>
+  </li>
+</ol>
+
+<p>And you’re good to go. Verify your source by running a tutorial case.</p>
+
+<p>The purpose of this article is to set up a <strong>development</strong> environment for OpenFOAM — you need to create:</p>
+
+<ol>
+  <li>
+    <p>A directory that houses your custom solver and library source code. This is preferably somewhere in your <strong>$WM_PROJECT_DIR</strong> folder.</p>
+  </li>
+  <li>
+    <p>Directories for the binaries generated from your custom solver and the .so files generated from your custom library. You’ll need to create a directory that is defined by your variables <strong>$FOAM_USER_APPBIN</strong> and **$FOAM_USER_LIBBIN **respectively.</p>
+  </li>
+</ol>
+
+<p>This is how my custom solver and library directory (as described in 1.) should look like:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*_qMiorNX0Qk96gHyHrhEig.png" alt="" /></p>
+
+<p>myReactingParcelFoam is my custom solver modifying reactingParcelFoam, and surfaceFilmModels is where I hold the libraries that the solver depends on.</p>
+
+<p>Notice the vscode folder? The perfect pair to OpenFOAM programming, as I’ve discovered, is <a href="https://code.visualstudio.com/">Visual Studio Code</a>. You can download this to run on your Windows system. Yes — you run it on Windows and keep the source in your WSL environment. You need to install the <a href="https://code.visualstudio.com/remote-tutorials/wsl/getting-started">remote WSL extension</a> in VS Code to couple the two environments. Additionally, install the <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools">C/C++ extension</a> too.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*9k6bv6VmYFTM0VniBTynMQ.png" alt="What your extensions should look like" /><em>What your extensions should look like</em></p>
+
+<p>Voila! All you need to do is run the following command in the directory you want to create a VS Code directory for:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>code . 
+</code></pre></div></div>
+
+<p>This creates a .vscode folder in that directory. Additionally, it will open up VS Code with your project, for instance:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*jFosjbe2Wxj2Hqj0XUVMNg.png" alt="What your VS Code instance should look like (minus the files in .vscode, we’ll get to this)" /><em>What your VS Code instance should look like (minus the files in .vscode, we’ll get to this)</em></p>
+
+<p>The files in .vscode that are of relevance are: <em>launch.json</em>, <em>tasks.json *and *c_cpp_properties.json</em>. These will be created when you add a configuration, but you will have to modify them. These give VS Code inputs on what task to run.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*wXqMwzDj5VuMw5JV8igGqQ.png" alt="A sample tasks.json file" /><em>A sample tasks.json file</em></p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*HJZ4TXPlKAzGRgzHYAZhfA.png" alt="A sample launch.json file" /><em>A sample launch.json file</em></p>
+
+<p>If you’ve gone through these .json files, the command in <em>tasks.json</em> is <strong>wmake</strong>, which is a wrapper around make for OpenFOAM. This is given a label <em>*wmake-build **which is referenced in the “preLaunchTask” field in *launch.json</em>.</p>
+
+<p>“program” specifies where to deposit the binary from the executable. As discussed, this should be in <strong>$FOAM_USER_APPBIN.</strong></p>
+
+<p>The final .json file, <em>c_cpp_properties.json</em>, contains the include paths for the compiler, as well as the settings for Intellisense.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*OgX1Oz6TLtc5vF_Wwrv-pw.png" alt="" /></p>
+
+<p>Edit the Make/files to make sure your binary ends up in the right place after wmake.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*8WSHlW8QLAz48vPortUHHA.png" alt="" /></p>
+
+<p>This process is very similar for compiling your own libraries. You will have to write in <em>*wmake libso **in the *tasks.json</em> file instead to compile all the .so files.</p>
+
+<p>And voila, you can compile OpenFOAM code! Complete with code completion and references to other code blocks — this allows for a seamless start into the freedom OpenFOAM development brings with it.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2732/1*reDyQdIu4_p2RvhvQt64ag.png" alt="" /></p>
+:ET

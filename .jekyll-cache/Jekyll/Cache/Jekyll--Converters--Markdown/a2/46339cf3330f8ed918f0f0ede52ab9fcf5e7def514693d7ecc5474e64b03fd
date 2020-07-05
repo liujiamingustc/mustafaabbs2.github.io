@@ -1,0 +1,143 @@
+I"%<p>This is a the second article in a series exploring utilities of OpenFOAM for viewers beginning with CFD — geared towards OpenFOAM beginners. The toolbox has a steep learning curve, but a see-through box offers far more control than a black one. Though we set up an environment to code our own solvers in the last article, we don’t have a debug environment to fix things when wrong, or to see how the code flows.</p>
+
+<p><a href="https://www.google.com/search?q=Openfoam+debug+Opt&amp;rlz=1C1CHBF_enKW850KW850&amp;oq=Openfoam+debug+Opt&amp;aqs=chrome..69i57j35i39l3j69i60j69i58j69i60l2.4077j0j7&amp;sourceid=chrome&amp;ie=UTF-8">Debug mode</a> allows you to do just this. We unpacked OpenFOAM directly into the <em>/opt/</em> folder in our last article. This was the default “Opt” compilation. OpenFOAM needs to be compiled again in debug mode. Navigate to your .bashrc file in OpenFOAM’s* etc/* folder and switch the flag:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>WM_COMPILE_OPTION=**Debug**
+</code></pre></div></div>
+
+<p>Move back a directory and compile OpenFOAM:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./Allwmake
+</code></pre></div></div>
+
+<p>Debug mode is almost double the size of the normal compilation. This will take a while, atleast a few hours. Try running *Allwmake *in parallel to speed things up (for example, here with four processors):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./Allwmake -j 4
+</code></pre></div></div>
+
+<p>I recommend aliases to switch between your debug and Opt modes. Copy your OpenFOAM <em>.bashrc *file into</em> .bashrc_debug*. Source your *.bashrc_debug *file to activate debug mode.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>**alias** of1912deb=”source /opt/OpenFOAM/OpenFOAM-v1912/etc/bashrc_debug”
+</code></pre></div></div>
+
+<p>A quick check to see if you’re in debug mode -</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>**which** icoFoam
+
+//should get--&gt; /opt/OpenFOAM/OpenFOAM-v1912/platforms/linux64Gcc63DPInt32**Debug**/bin/icoFoam
+</code></pre></div></div>
+
+<p>Debug mode allows the <a href="http://www.gnu.org/software/gdb/">gdb</a> debugger to step through your code. You could do this in a terminal too, but I prefer working in an IDE, especially for code that’s as layered as OpenFOAM.</p>
+
+<p>We’ll walk through<a href="https://www.openfoam.com/documentation/guides/latest/doc/guide-applications-solvers-incompressible-simpleFoam.html"> simpleFoam</a> in this example. simpleFoam uses the <a href="https://en.wikipedia.org/wiki/SIMPLE_algorithm">SIMPLE</a> algorithm to solve the N-S equations for incompressible fluid flow, for a steady state solution. It’s a great starting point for most explanation on OpenFOAM.</p>
+
+<p>Copy simpleFoam into your $WM_PROJECT_USER_DIR.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cp -r $FOAM_SOLVERS/incompressible/simpleFoam $WM_PROJECT_USER_DIR
+</code></pre></div></div>
+
+<p>To debug the solver, you need to supply it with the input files it needs from the OpenFOAM case structure. I simply copy a <em>pitzDaily</em> tutorial into the same folder as the solver code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cp -r $FOAM_SOLVERS/incompressible/simpleFoam/pitzDaily/* $WM_PROJECT_USER_DIR/simpleFoam
+</code></pre></div></div>
+
+<p>The contents of your folder should look like this:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*ir8AASrzIsdDAxqrdqpK9Q.png" alt="" /></p>
+
+<p>Start your VSCode environment:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>code .
+</code></pre></div></div>
+
+<p>Navigate to the <em>simpleFoam.C *file. Place two breakpoints at the same locations as in the picture, after *argList:addNote</em> and at <em>turbulence -&gt; validate()</em>.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*GfL7HeWOzxlwv6gDOJTLAQ.png" alt="" /></p>
+
+<p>For those not familiar with debuggers — find the command Run — Start Debugging to execute.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*liKX-zqCw6G8-ZOjRfb3gg.png" alt="Options to move along the code — Continue, Step Over, Step Into, Step Out" /><em>Options to move along the code — Continue, Step Over, Step Into, Step Out</em></p>
+
+<p>To move through the code, there are four options you need to use:</p>
+
+<ol>
+  <li>
+    <p><strong>Continue</strong>: will move to the next breakpoint</p>
+  </li>
+  <li>
+    <p><strong>Step Over</strong>: will proceed to the next line of code without entering the function on that line. If you step over <em>turbulence-&gt;validate()</em>, it will move to the next line after executing it, but you will not move through the contents of the method itself</p>
+  </li>
+  <li>
+    <p><strong>Step Into</strong>: will enter the method</p>
+  </li>
+  <li>
+    <p><strong>Step Out</strong>: returns control to the preceding stack frame — i.e. if you’ve entered <em>turbulence-&gt;validate()</em> with Step Into, it will finish execution of the method and return control to simpleFoam.C</p>
+  </li>
+</ol>
+
+<p>Let’s run the debugger. If you want to work your way through the following header files too, I recommend adding a breakpoint at the *argList::addNote *line.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>argList::addNote
+
+(
+
+"Steady-state solver for incompressible, turbulent flows."
+
+);
+
+#include "postProcess.H"
+#include "addCheckCaseOptions.H"
+#include "setRootCaseLists.H"
+#include "createTime.H"
+#include "createMesh.H"
+#include "createControl.H"
+#include "createFields.H"
+#include "initContinuityErrs.H"
+</code></pre></div></div>
+
+<p>We won’t enter the header files this way, but I can quickly desribe how the flow of code happens through these.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include "postProcess.H"
+#include "addCheckCaseOptions.H"
+#include "setRootCaseLists.H"
+</code></pre></div></div>
+
+<p>The <em>postProcess.H</em> header file checks if the postProcess flag is issued and creates a list of all the function objects in the controlDict. *setRootCaseLists.H *parses through all the advanced switches that can be given to simpleFoam. For a list of these switches, see the <a href="https://www.openfoam.com/documentation/guides/latest/man/simpleFoam.html">documentation</a>.</p>
+
+<p>Header files are entered as though they’re part of the code. You can observe which file the debugger is currently paused at by looking at the call stack.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*n_GFqwR0A_36kyeoatGqLQ.png" alt="" /></p>
+
+<p>Let’s work our way down the code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include "createTime.H"
+#include "createMesh.H"
+#include "createControl.H"
+</code></pre></div></div>
+
+<p><em>createTime.H</em> and <em>createMesh.H</em>, as their names suggests, create their respective* runTime* and <em>mesh</em> objects. <em>createTime.H</em> generates your first real output statement to your log file — “Create time”.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Foam::Info&lt;&lt; “Create time\n” &lt;&lt; Foam::endl;
+
+Foam::Time runTime(Foam::Time::controlDictName, args);
+</code></pre></div></div>
+
+<p><em>createMesh.H</em> is simple — it creates a mesh object (class <em>fvMesh</em>) for the corresponding <em>runTime</em> object.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Foam::autoPtr&lt;Foam::fvMesh&gt; meshPtr(nullptr);
+
+Foam::fvMesh&amp; mesh = meshPtr();
+</code></pre></div></div>
+
+<p><em>createFields.H *is present in your solver directory. The field objects <strong>*p</strong></em> (pressure), <strong><em>U</em></strong> (velocity) are created here. Moreover, any new fields you want to evaluate — here’s where they need to be created for the solver to parse through.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*zJ46W2L9c0C7XgDPHxRa4A.png" alt="createFields.H" /><em>createFields.H</em></p>
+
+<p>The face flux <strong><em>phi</em></strong> is also created here through a header file inside *createFields.H. *Additionally, the <strong>transport model</strong> (based on your viscosity) as well as the <strong>turbulence model</strong> objects are created here.</p>
+
+<p>Keep checking your terminal to see your outputs too — this is a sanity check to see that the flow of output is just like what we’d expect:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*GVTQGg15lCugAW9UOwnuhw.png" alt="Your terminal" /><em>Your terminal</em></p>
+
+<p>Voila, you’ve got through the setting up of the solver — your mesh, time, and fields, and models are now ready. The next article in the series will stick with this example, but move onto the actual code characteristic to <em>simpleFoam</em> — with a bit of math to explain how the SIMPLE algorithm is implemented.</p>
+:ET

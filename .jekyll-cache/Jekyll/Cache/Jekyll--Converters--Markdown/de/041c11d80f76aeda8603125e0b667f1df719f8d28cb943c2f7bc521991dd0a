@@ -1,0 +1,84 @@
+I"�<p>I spent a summer with a research group specializing in a variety of topics in non-linear dynamics, one of them being the Fluid Structure Interaction (FSI) of flapping wings. It was 2015 — I did not work with OpenFOAM then, but I’m sure the more recent FSI solvers with foam-extend were only in their infancy, in terms of popularity.</p>
+
+<p>foam-extend is getting a bit older for wear in 2020. Other development branches, including the ESI-OpenCFD (v1912 etc) that we’ve made use of on our WSL Ubuntu in previous articles may not be fully compatible with the other FSI utilities out there, including <a href="https://github.com/davidsblom/FOAM-FSI">FOAM-FSI</a> (Feel free to correct me on this though).</p>
+
+<p>I’m going to keep it short and get to the workflow. I want users to be able to set up a common FSI tutorial case — a perpendicular flap in a 2-D channel. There are a multitude of options — especially with the choice of a FE solver, I hope this helps you avoid a very tedious path to just setting up an environment. I had to personally go through a ton of debugging to set this up correctly — this should help everyone save some time.</p>
+
+<p>How are forces transmitted back and forth between fluid and solid solvers? Here’s where [<strong>preCICE](https://www.precice.org/)</strong> comes in. PreCICE can couple different types of solvers together in a multi-physics environment. For example, an **adapter **communicates data from the fluid solver, which is then mapped via PreCICE and lands at the adapter of the solid solver, and then the other way around. There are adapters for a range of different solvers, which to me, gives PreCICE its appeal.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2220/1*2jlsdJ8fMwGRKVz2qHBQvw.png" alt="(taken from precice.org)" /><em>(taken from precice.org)</em></p>
+
+<p>You need **five **things:</p>
+
+<ol>
+  <li>
+    <p>preCICE</p>
+  </li>
+  <li>
+    <p>A fluid solver — OpenFOAM (I use v19.12)</p>
+  </li>
+  <li>
+    <p>An OpenFOAM-preCICE adapter</p>
+  </li>
+  <li>
+    <p>A solid solver — deal.II</p>
+  </li>
+  <li>
+    <p>A deal.II-preCICE adapter</p>
+  </li>
+</ol>
+
+<p>There are some dependencies I recommend you have before you start. These are the ones I needed for <strong>Ubuntu-18.04</strong>. Copy and paste the following in your terminal.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt update &amp;&amp; \
+sudo apt install build-essential cmake libeigen3-dev libxml2-dev libboost-all-dev python3-dev python3-numpy
+</code></pre></div></div>
+
+<p>As a note to organize your files better, create a directory titled FSI in your home folder that will house all the source code in the coming section. I’m going to assume you have a working OpenFOAM installation on your system. If not, check this out.</p>
+
+<p><strong>A. Get preCICE</strong></p>
+
+<p>I prefer having the source and building with CMake. Follow the instructions in this <a href="https://github.com/precice/precice/wiki/Building:-Using-CMake">wiki</a>. For people still drawing a blank, cmake generates your MakeFile on which you run the command make for the actual compilation. make install sends the installed files to their intended locations on the system.</p>
+
+<p><strong>B</strong>. <strong>Get the OpenFOAM adapter for preCICE</strong></p>
+
+<p>This is explained <a href="https://github.com/precice/openfoam-adapter/wiki/Building">here</a>. You will use the Allwmake script to create the adapter -which is actually just a shared library preciceAdapterFunctionObject , which needs to be referenced in <em>controlDict</em>. Don’t worry about this, the repository is equipped with working tutorials where you don’t need to change a thing!</p>
+
+<p><strong>C. Get deal.II</strong></p>
+
+<p>This is the solid solver we’ll use. Just like preCICE, the installation is again done from source — you’ll have to <a href="https://www.dealii.org/9.2.0/readme.html">download the source code</a> and compile it. This takes a while — allot a few hours for a compilation when done with a single processor.</p>
+
+<p>**Note — **I found it difficult to install deal.II with the OpenFOAM environment sourced because of clashing dependencies. Be sure to comment out sourcing the OpenFOAM .bashrc file in your system .bashrc.</p>
+
+<p><strong>D</strong>. <strong>Get the deal.II adapter for preCICE</strong></p>
+
+<p>Follow the instructions on this <a href="https://github.com/precice/dealii-adapter/wiki/Building">page</a>.</p>
+
+<p>Ideally, you should now have a folder with the source code for <strong>A</strong>, <strong>B</strong>, <strong>C</strong>, and <strong>D</strong>. <strong>Keep the source code around</strong> — we may need to modify and recompile.</p>
+
+<p>Now — download the <a href="https://github.com/precice/tutorials/tree/master/FSI">tutorials repository</a> in your <strong>$FOAM_RUN</strong> folder. These are the FSI cases we can test our environment with.</p>
+
+<p>The tutorial we will test is the FSI/flap_perp_2D/OpenFOAM-deal.II in the tutorials folder.</p>
+
+<p>Navigate to the **deal.II adapter (D) **source folder. The adapter has individual solvers which you can build with cmake and make . Do this in the linear_elasticity/ subfolder. Copy the executable you get to the FSI/flap_perp_2D/OpenFOAM-deal.II/Solid folder. This is your solid solver executable.</p>
+
+<p><strong>Open two terminals</strong> — source one with OpenFOAM, leave the other one unsourced. On the unsourced terminal, after navigating to FSI/flap_perp_2D/OpenFOAM-deal.II/, run ./Solid/linear_elasticity Solid/linear_elasticity.prm . This starts the solid solver — preCICE will now wait for you to execute OpenFOAM on the other terminal:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*ub-3jvm69WLyHUTRvTNAeg.png" alt="" /></p>
+
+<p>Go to the terminal sourced with OpenFOAM. Run the runFluid script to launch the OpenFOAM run script. <strong>This will start the solver on both terminals.</strong></p>
+
+<p>It is important that you proof *controlDict *to make sure your fluid and solid results are being printed at the same time intervals. You will now have VTK folders in both Solid/ and Fluid/ folders which can be read into Paraview.</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/4496/1*KqOszeSytheCB3K_edX_oQ.png" alt="Results from Fluid/ (time =5)" /><em>Results from Fluid/ (time =5)</em></p>
+
+<p><img src="https://cdn-images-1.medium.com/max/4496/1*thAE8HLpblpmyKsZ9g8PYg.png" alt="Results from Solid/ (time =5)" /><em>Results from Solid/ (time =5)</em></p>
+
+<p>This is a **dynamicMesh **being employed. You can observe the changes in the structure with each time step. For instance, the meshes at the first and last time step look like this:</p>
+
+<p><img src="https://cdn-images-1.medium.com/max/4496/1*FGktko4MWLVJuBQmUn4_tw.png" alt="Channel at time = 0" /><em>Channel at time = 0</em></p>
+
+<p><img src="https://cdn-images-1.medium.com/max/4496/1*DFcOz8fgv48HF1k7wFsPag.png" alt="Channel at time =5" /><em>Channel at time =5</em></p>
+
+<p>This could be a good point for more complicated simulations. I’m no expert on deal.II, but there are other models, including non-linear elasticity that can be employed. 3-D cases, including the possibility of preparing cases for flapping airfoils — if you have other ideas on simple use cases in FSI, write to me!</p>
+:ET

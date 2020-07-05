@@ -1,0 +1,2 @@
+I"<p>The previous articles in this series took on debugging the simpleFoam solver through a VSCode debugger. SIMPLEC, a “consistent” implementation of the SIMPLE algorithm can be toggled on and off via the “consistent” switch in your fvSolutions file.</p>
+:ET
