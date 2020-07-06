@@ -135,6 +135,8 @@
               <a href="/about">About</a>
             </li><li class="masthead__menu-item">
               <a href="/contact">Contact</a>
+            </li><li class="masthead__menu-item">
+              <a href="/cv">CV</a>
             </li></ul>
         
         <button class="greedy-nav__toggle hidden" type="button">
@@ -175,7 +177,7 @@
     
     
       <div class="author__bio" itemprop="description">
-        <p>Applied Mathematics and Computational Fluid Dynamics (CFD) - more than just colorful pictures!</p>
+        <p>I write about topics in numerical mathematics and Computational Fluid Dynamics (CFD). There are some colorful pictures too</p>
 
       </div>
     
@@ -282,11 +284,12 @@
 
 <p>I’m going to keep it short and get to the workflow. I want users to be able to set up a common FSI tutorial case — a perpendicular flap in a 2-D channel. There are a multitude of options — especially with the choice of a FE solver, I hope this helps you avoid a very tedious path to just setting up an environment. I had to personally go through a ton of debugging to set this up correctly — this should help everyone save some time.</p>
 
-<p>How are forces transmitted back and forth between fluid and solid solvers? Here’s where [<strong>preCICE](https://www.precice.org/)</strong> comes in. PreCICE can couple different types of solvers together in a multi-physics environment. For example, an **adapter **communicates data from the fluid solver, which is then mapped via PreCICE and lands at the adapter of the solid solver, and then the other way around. There are adapters for a range of different solvers, which to me, gives PreCICE its appeal.</p>
+<p>How are forces transmitted back and forth between fluid and solid solvers? Here’s where <a href="https://www.precice.org/">preCICE</a> comes in. PreCICE can couple different types of solvers together in a multi-physics environment. For example, an **adapter **communicates data from the fluid solver, which is then mapped via PreCICE and lands at the adapter of the solid solver, and then the other way around. There are adapters for a range of different solvers, which to me, gives PreCICE its appeal.</p>
 
-<p><img src="https://cdn-images-1.medium.com/max/2220/1*2jlsdJ8fMwGRKVz2qHBQvw.png" alt="(taken from precice.org)" /><em>(taken from precice.org)</em></p>
+<p><img src="https://cdn-images-1.medium.com/max/2220/1*2jlsdJ8fMwGRKVz2qHBQvw.png" alt="(taken from precice.org)" />
+<em>(taken from precice.org)</em></p>
 
-<p>You need **five **things:</p>
+<p>You need <strong>five</strong> things:</p>
 
 <ol>
   <li>
@@ -326,7 +329,7 @@ sudo apt install build-essential cmake libeigen3-dev libxml2-dev libboost-all-de
 
 <p>This is the solid solver we’ll use. Just like preCICE, the installation is again done from source — you’ll have to <a href="https://www.dealii.org/9.2.0/readme.html">download the source code</a> and compile it. This takes a while — allot a few hours for a compilation when done with a single processor.</p>
 
-<p>**Note — **I found it difficult to install deal.II with the OpenFOAM environment sourced because of clashing dependencies. Be sure to comment out sourcing the OpenFOAM .bashrc file in your system .bashrc.</p>
+<p><strong>Note —</strong> I found it difficult to install deal.II with the OpenFOAM environment sourced because of clashing dependencies. Be sure to comment out sourcing the OpenFOAM .bashrc file in your system .bashrc.</p>
 
 <p><strong>D</strong>. <strong>Get the deal.II adapter for preCICE</strong></p>
 
@@ -338,7 +341,7 @@ sudo apt install build-essential cmake libeigen3-dev libxml2-dev libboost-all-de
 
 <p>The tutorial we will test is the FSI/flap_perp_2D/OpenFOAM-deal.II in the tutorials folder.</p>
 
-<p>Navigate to the **deal.II adapter (D) **source folder. The adapter has individual solvers which you can build with cmake and make . Do this in the linear_elasticity/ subfolder. Copy the executable you get to the FSI/flap_perp_2D/OpenFOAM-deal.II/Solid folder. This is your solid solver executable.</p>
+<p>Navigate to the <strong>deal.II adapter (D)</strong> source folder. The adapter has individual solvers which you can build with cmake and make . Do this in the linear_elasticity/ subfolder. Copy the executable you get to the FSI/flap_perp_2D/OpenFOAM-deal.II/Solid folder. This is your solid solver executable.</p>
 
 <p><strong>Open two terminals</strong> — source one with OpenFOAM, leave the other one unsourced. On the unsourced terminal, after navigating to FSI/flap_perp_2D/OpenFOAM-deal.II/, run ./Solid/linear_elasticity Solid/linear_elasticity.prm . This starts the solid solver — preCICE will now wait for you to execute OpenFOAM on the other terminal:</p>
 
@@ -352,7 +355,7 @@ sudo apt install build-essential cmake libeigen3-dev libxml2-dev libboost-all-de
 
 <p><img src="https://cdn-images-1.medium.com/max/4496/1*thAE8HLpblpmyKsZ9g8PYg.png" alt="Results from Solid/ (time =5)" /><em>Results from Solid/ (time =5)</em></p>
 
-<p>This is a **dynamicMesh **being employed. You can observe the changes in the structure with each time step. For instance, the meshes at the first and last time step look like this:</p>
+<p>This is a <strong>dynamicMesh</strong> being employed. You can observe the changes in the structure with each time step. For instance, the meshes at the first and last time step look like this:</p>
 
 <p><img src="https://cdn-images-1.medium.com/max/4496/1*FGktko4MWLVJuBQmUn4_tw.png" alt="Channel at time = 0" /><em>Channel at time = 0</em></p>
 

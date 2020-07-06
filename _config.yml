@@ -20,7 +20,7 @@ title                    : "Programming with Fluids"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Mustafa Bhotvawala"
-description              : "Applied Mathematics and Computational Fluid Dynamics (CFD) - more than just colorful pictures! "
+description              : "I write about topics in numerical mathematics and Computational Fluid Dynamics (CFD). There are some colorful pictures too"
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -95,7 +95,7 @@ analytics:
 author:
   name             : "Mustafa Bhotvawala"
   avatar           : "/assets/images/dp.png"
-  bio              : "Applied Mathematics and Computational Fluid Dynamics (CFD) - more than just colorful pictures! "
+  bio              : "I write about topics in numerical mathematics and Computational Fluid Dynamics (CFD). There are some colorful pictures too"
   location         : "Wolfsburg"
   #email            : "mustafa.bhotvawala@rwth-aachen.de"
   links:

@@ -1,10 +1,10 @@
 ---
 layout: single
 permalink: /contact/      
-title: Contact
+title: 
 ---
 
 
 ### Contact me
 
-[mustafa.bhotvawala@rwth-aachen.de](mailto:mustafa.bhotvawala@rwth-aachen.de)
+General questions on OpenFOAM or my blog posts welcome at [mustafa.bhotvawala@rwth-aachen.de](mailto:mustafa.bhotvawala@rwth-aachen.de)

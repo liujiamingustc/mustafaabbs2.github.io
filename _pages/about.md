@@ -9,7 +9,7 @@ I'm a graduate student in Computational Science at RWTH Aachen University. I lev
 
 ### OpenFOAM
 
-I've used OpenFOAM to get a behind-the-scenes view on CFD topics. 
+I've used OpenFOAM to get a behind-the-scenes view on CFD topics. And hence, a disclaimer follows:
 
 ---
 **Disclaimer**

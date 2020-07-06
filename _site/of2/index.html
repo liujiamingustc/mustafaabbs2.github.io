@@ -135,6 +135,8 @@
               <a href="/about">About</a>
             </li><li class="masthead__menu-item">
               <a href="/contact">Contact</a>
+            </li><li class="masthead__menu-item">
+              <a href="/cv">CV</a>
             </li></ul>
         
         <button class="greedy-nav__toggle hidden" type="button">
@@ -175,7 +177,7 @@
     
     
       <div class="author__bio" itemprop="description">
-        <p>Applied Mathematics and Computational Fluid Dynamics (CFD) - more than just colorful pictures!</p>
+        <p>I write about topics in numerical mathematics and Computational Fluid Dynamics (CFD). There are some colorful pictures too</p>
 
       </div>
     
@@ -321,7 +323,9 @@
 
 <p>The contents of your folder should look like this:</p>
 
-<p><img src="https://cdn-images-1.medium.com/max/2000/1*ir8AASrzIsdDAxqrdqpK9Q.png" alt="" /></p>
+<p align="center">
+  <img src="https://cdn-images-1.medium.com/max/2000/1*ir8AASrzIsdDAxqrdqpK9Q.png" />
+</p>
 
 <p>Start your VSCode environment:</p>
 
@@ -334,7 +338,8 @@
 
 <p>For those not familiar with debuggers — find the command Run — Start Debugging to execute.</p>
 
-<p><img src="https://cdn-images-1.medium.com/max/2000/1*liKX-zqCw6G8-ZOjRfb3gg.png" alt="Options to move along the code — Continue, Step Over, Step Into, Step Out" /><em>Options to move along the code — Continue, Step Over, Step Into, Step Out</em></p>
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*liKX-zqCw6G8-ZOjRfb3gg.png" alt="Options to move along the code — Continue, Step Over, Step Into, Step Out" />
+<em>Options to move along the code — Continue, Step Over, Step Into, Step Out</em></p>
 
 <p>To move through the code, there are four options you need to use:</p>
 
@@ -409,7 +414,9 @@ Foam::fvMesh&amp; mesh = meshPtr();
 
 <p><em>createFields.H *is present in your solver directory. The field objects <strong>*p</strong></em> (pressure), <strong><em>U</em></strong> (velocity) are created here. Moreover, any new fields you want to evaluate — here’s where they need to be created for the solver to parse through.</p>
 
-<p><img src="https://cdn-images-1.medium.com/max/2000/1*zJ46W2L9c0C7XgDPHxRa4A.png" alt="createFields.H" /><em>createFields.H</em></p>
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*zJ46W2L9c0C7XgDPHxRa4A.png" alt="createFields.H" /></p>
+
+<p><em>createFields.H</em></p>
 
 <p>The face flux <strong><em>phi</em></strong> is also created here through a header file inside *createFields.H. *Additionally, the <strong>transport model</strong> (based on your viscosity) as well as the <strong>turbulence model</strong> objects are created here.</p>
 
