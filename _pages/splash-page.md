@@ -1,5 +1,5 @@
 ---
-title: "Splash Page"
+title: "Programming fluids made simple"
 layout: splash
 permalink: /splash-page/
 header:
@@ -7,7 +7,7 @@ header:
   overlay_filter: "0.5"
   overlay_image: /assets/images/squarecyl.png
   actions:
-    - label: "Download"
-      url: "#test-link"
-excerpt: "Another colorful picture"
+    - label: "Go to Tutorials"
+      url: "/"
+excerpt: ""
 ---
